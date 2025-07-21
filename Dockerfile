@@ -9,6 +9,5 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates
 WORKDIR /root/
 COPY --from=build /app/bot .
-
 # Явно прокидываем переменную из Railway
 CMD ["./bot"]
