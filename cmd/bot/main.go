@@ -7,14 +7,13 @@ import (
 	"tgBot/internal/app"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Ошибка загрузки .env файла")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Ошибка загрузки .env файла")
+	// }
 
 	token := os.Getenv("TELEGRAM_TOKEN")
 	if token == "" {
