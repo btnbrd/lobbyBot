@@ -11,6 +11,4 @@ WORKDIR /root/
 COPY --from=build /app/bot .
 
 # Явно прокидываем переменную из Railway
-ENV TELEGRAM_TOKEN=$TELEGRAM_TOKEN
-
 CMD ["./bot"]
