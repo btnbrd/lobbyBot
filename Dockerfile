@@ -13,7 +13,5 @@ WORKDIR /root/
 
 COPY --from=build /app/bot .
 
-# debug output - remove later
-#ENV TELEGRAM_TOKEN=debug-missing-token
 
 CMD ["./bot"]
