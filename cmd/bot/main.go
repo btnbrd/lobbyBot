@@ -19,6 +19,7 @@ func main() {
 	if token == "" {
 		log.Fatal("TELEGRAM_TOKEN не найден")
 	}
+	log.Println("TELEGRAM_TOKEN from env:", os.Getenv("TELEGRAM_TOKEN"))
 
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
