@@ -14,6 +14,7 @@ type LobbyService struct {
 	mu          sync.Mutex
 	lobbies     map[string]*entities.Lobby
 	userToLobby map[string]string
+	userToChat  map[string]int64
 	letters     []rune
 }
 
@@ -21,6 +22,7 @@ func NewLobbyService() *LobbyService {
 	return &LobbyService{
 		lobbies:     make(map[string]*entities.Lobby),
 		userToLobby: make(map[string]string),
+		userToChat:  make(map[string]int64),
 		letters:     []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
 	}
 }

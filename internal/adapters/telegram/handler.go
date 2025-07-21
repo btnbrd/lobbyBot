@@ -29,40 +29,43 @@ func (h *Handler) Handle(update tgbotapi.Update) {
 		return
 	}
 
-	user := entities.NewUser(update.Message.From.UserName)
+	user := entities.NewUser(update.Message.From.UserName).WithChatId(update.Message.Chat.ID)
 	text := update.Message.Text
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 
-	if update.Message.IsCommand() {
-		h.clearState(user.Name())
-		h.handleCommand(update, &msg, user)
+	if update.Message.ForwardFrom != nil {
+		forwardedUser := entities.NewUser(update.Message.ForwardFrom.UserName)
+		commands.Connect(h.service, user, forwardedUser.Name(), &msg)
 	} else {
-		switch h.getState(user.Name()) {
-		case StateJoinWait:
+		if update.Message.IsCommand() {
 			h.clearState(user.Name())
+			h.handleCommand(update, &msg, user)
+		} else {
+			switch h.getState(user.Name()) {
+			case StateJoinWait:
+				h.clearState(user.Name())
 
-			code := strings.ToUpper(strings.TrimSpace(text))
-			commands.Join(h.service, user, code, &msg)
-			h.bot.Send(msg)
+				code := strings.ToUpper(strings.TrimSpace(text))
+				commands.Join(h.service, user, code, &msg)
 
-		case StateAddWait:
-			h.clearState(user.Name())
+			case StateAddWait:
+				h.clearState(user.Name())
 
-			subName := strings.ToLower(strings.TrimSpace(text))
-			commands.Connect(h.service, user, subName, &msg)
-			h.bot.Send(msg)
+				subName := strings.ToLower(strings.TrimSpace(text))
+				commands.Connect(h.service, user, subName, &msg)
 
-		case StateShuffleWait:
-			h.clearState(user.Name())
+			case StateShuffleWait:
+				h.clearState(user.Name())
 
-			commands.Shuffle(h.service, user, text, &msg)
-			h.bot.Send(msg)
+				commands.Shuffle(h.service, user, text, &msg, h.bot)
 
-		default:
-			msg.Text = "Я не понимаю это сообщение. Попробуй /help"
-			h.bot.Send(msg)
+			default:
+				msg.Text = "Я не понимаю это сообщение. Попробуй /help"
+
+			}
 		}
 	}
+	h.bot.Send(msg)
 }
 
 func (h *Handler) handleCommand(update tgbotapi.Update, msg *tgbotapi.MessageConfig, user *entities.User) {
@@ -70,8 +73,10 @@ func (h *Handler) handleCommand(update tgbotapi.Update, msg *tgbotapi.MessageCon
 	args := update.Message.CommandArguments()
 
 	switch command {
-	case "start", "help":
+	case "help":
 		commands.Help(user, msg)
+	case "start":
+		commands.Start(h.service, user)
 	case "create":
 		commands.Create(h.service, user, msg)
 	case "join":
@@ -92,7 +97,7 @@ func (h *Handler) handleCommand(update tgbotapi.Update, msg *tgbotapi.MessageCon
 			msg.Text = "Введите количество перестановок:"
 			h.setState(user.Name(), StateShuffleWait)
 		} else {
-			commands.Shuffle(h.service, user, args, msg)
+			commands.Shuffle(h.service, user, args, msg, h.bot)
 		}
 	case "add":
 		if args == "" {
@@ -105,7 +110,6 @@ func (h *Handler) handleCommand(update tgbotapi.Update, msg *tgbotapi.MessageCon
 		msg.Text = "Неизвестная команда"
 	}
 	msg.ReplyMarkup = h.getMainKeyboard()
-	h.bot.Send(*msg)
 }
 
 func (h *Handler) getMainKeyboard() tgbotapi.ReplyKeyboardMarkup {

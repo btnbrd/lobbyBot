@@ -10,7 +10,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func Shuffle(service *app.LobbyService, user *entities.User, arg string, msg *tgbotapi.MessageConfig) {
+func Shuffle(service *app.LobbyService, user *entities.User, arg string, msg *tgbotapi.MessageConfig, bot *tgbotapi.BotAPI) {
 	n, err := strconv.Atoi(strings.TrimSpace(arg))
 	if err != nil || n <= 0 {
 		msg.Text = "Пожалуйста, укажи положительное число. Пример: /shuffle 3"
@@ -31,4 +31,8 @@ func Shuffle(service *app.LobbyService, user *entities.User, arg string, msg *tg
 		text += "\n"
 	}
 	msg.Text = text
+	for _, perm := range permutations[0] {
+		message := tgbotapi.NewMessage(perm.ChatId(), text)
+		bot.Send(message)
+	}
 }

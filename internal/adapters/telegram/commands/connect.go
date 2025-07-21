@@ -14,6 +14,6 @@ func Connect(service *app.LobbyService, user *entities.User, args string, msg *t
 	if err != nil {
 		msg.Text = "Ошибка: " + err.Error()
 	} else {
-		msg.Text = sub.Name() + "успешно присоединился к лобби: " + strings.ToUpper(code)
+		msg.Text = sub.Name() + " успешно присоединился к лобби: " + strings.ToUpper(code)
 	}
 }

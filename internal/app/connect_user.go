@@ -12,7 +12,7 @@ func (s *LobbyService) ConnectUser(host *entities.User, user *entities.User) (st
 
 	code, ok := s.userToLobby[host.Name()]
 	if !ok {
-		return "", errors.New("<UNK>")
+		return "", errors.New("Lobby code not found")
 	}
 	code = strings.ToUpper(code)
 	lobby := s.lobbies[code]
